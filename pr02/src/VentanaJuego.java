@@ -2,6 +2,7 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.*;
 import java.util.Arrays;
 
@@ -19,6 +20,8 @@ public class VentanaJuego extends JFrame {
 	CocheJuego miCoche;        // Coche del juego
 	MiRunnable miHilo = null;  // Hilo del bucle principal de juego	
 	private Boolean[] pulsaciones = new Boolean[4];
+	private JLabel lMensaje;
+	
 	
 	/** Constructor de la ventana de juego. Crea y devuelve la ventana inicializada
 	 * sin coches dentro
@@ -39,10 +42,12 @@ public class VentanaJuego extends JFrame {
 		pPrincipal.setBackground( Color.white );
 		// Añadido de componentes a contenedores
 		add( pPrincipal, BorderLayout.CENTER );
-		pBotonera.add( bAcelerar );
-		pBotonera.add( bFrenar );
-		pBotonera.add( bGiraIzq );
-		pBotonera.add( bGiraDer );
+//		pBotonera.add( bAcelerar );
+//		pBotonera.add( bFrenar );
+//		pBotonera.add( bGiraIzq );
+//		pBotonera.add( bGiraDer );
+		lMensaje= new JLabel("Puntos 0 - ESTRELLAS PERDIDAS 0");
+		pBotonera.add(lMensaje);
 		add( pBotonera, BorderLayout.SOUTH );
 		// Formato de ventana
 		setSize( 1000, 750 );
@@ -199,6 +204,15 @@ public class VentanaJuego extends JFrame {
 		public void run() {
 			// Bucle principal forever hasta que se pare el juego...
 			while (sigo) {
+				
+				if (System.currentTimeMillis()-miMundo.getUltimaCreacion()>=1200){
+					miMundo.creaEstrella();
+				}
+				if (miMundo.quitaYRotaEstrellas(6000) || miMundo.choquesConEstrellas()){
+					lMensaje.setText("Puntos "+  miMundo.getPuntuacion() + " - ESTRELLAS PERDIDAS " + miMundo.getPerdidas());
+				}
+				
+				
 				fuerza=0;
 				if (pulsaciones[0]){
 					//miCoche.acelera( +5, 1 );

@@ -14,11 +14,23 @@ public class MundoJuego {
 	private JPanel panel;  // panel visual del juego
 	CocheJuego miCoche;    // Coche del juego
 	ArrayList <Estrella> estrellas = new ArrayList<Estrella>();
+	private double ultimaCreacion;
+	private int puntuacion=0;
+	private int perdidas =0;
+	
 	/** Construye un mundo de juego
 	 * @param panel	Panel visual del juego
 	 */
 	public MundoJuego( JPanel panel ) {
 		this.panel = panel;
+	}
+
+	public int getPuntuacion() {
+		return puntuacion;
+	}
+
+	public int getPerdidas() {
+		return perdidas;
 	}
 
 	/** Crea un coche nuevo y lo añade al mundo y al panel visual
@@ -38,8 +50,13 @@ public class MundoJuego {
 		e.setPosicion();
 		estrellas.add(e);
 		e.getMiGrafico().repaint();
+		ultimaCreacion= System.currentTimeMillis();
 	}
 	
+	public double getUltimaCreacion() {
+		return ultimaCreacion;
+	}
+
 	/** Devuelve el coche del mundo
 	 * @return	Coche en el mundo. Si no lo hay, devuelve null
 	 */
@@ -142,6 +159,55 @@ public class MundoJuego {
 		} else {
 			coche.acelera(aceleracion, 0.04);
 		}
+	}
+	/** Quita todas las estrellas que lleven en pantalla demasiado tiempo 
+	 *   * y rota 10 grados las que sigan estando   
+	 *   * @param maxTiempo Tiempo máximo para que se mantengan las estrellas (msegs) 
+	 *     * @return Número de estrellas quitadas */  
+	public boolean quitaYRotaEstrellas( long maxTiempo ) {
+		boolean ret=false;
+		for (Estrella est:estrellas){
+			
+			if (est.isValida()){
+				if ( System.currentTimeMillis()-est.getTiempo()>maxTiempo){
+					est.setValida(false);
+					panel.remove(est.getMiGrafico());
+					ret= true;
+					perdidas++;
+				}else{
+					//girar la estrella
+					est.gira(10);
+				}
+			}
+			
+		}
+		panel.repaint();
+		return ret;
+	
+	}
+	public boolean choquesConEstrellas() {
+		boolean ret=false;
+		for (Estrella est:estrellas){
+			if (est.isValida() && hayChoque(est)){
+				puntuacion+=Estrella.PUNTOS;
+				est.setValida(false);
+				panel.remove(est.getMiGrafico());
+				ret=true;
+			}
+		}
+		return ret;
+	}
+
+	private boolean hayChoque(Estrella est) {
+		if (est.getPosX()+JLabelEstrella.RADIO_ESFERA_ESTRELLA>miCoche.getPosX()-JLabelCoche.RADIO_ESFERA_COCHE
+			&& est.getPosX()-JLabelEstrella.RADIO_ESFERA_ESTRELLA<miCoche.getPosX()+JLabelCoche.RADIO_ESFERA_COCHE
+			&&est.getPosY()+JLabelEstrella.RADIO_ESFERA_ESTRELLA>miCoche.getPosY()-JLabelCoche.RADIO_ESFERA_COCHE
+			&& est.getPosY()-JLabelEstrella.RADIO_ESFERA_ESTRELLA<miCoche.getPosY()+JLabelCoche.RADIO_ESFERA_COCHE
+			)
+		{
+			return true;
+		}
+		return false;
 	}
 	
 }
