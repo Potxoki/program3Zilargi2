@@ -211,7 +211,9 @@ public class VentanaJuego extends JFrame {
 				if (miMundo.quitaYRotaEstrellas(6000) || miMundo.choquesConEstrellas()){
 					lMensaje.setText("Puntos "+  miMundo.getPuntuacion() + " - ESTRELLAS PERDIDAS " + miMundo.getPerdidas());
 				}
-				
+				if (miMundo.getPerdidas()>=10){
+					sigo=false;
+				}
 				
 				fuerza=0;
 				if (pulsaciones[0]){
